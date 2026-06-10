@@ -10,47 +10,53 @@ jobs:
   frontend-lint:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm and Node.js
-        uses: ./.github/actions/setup-pnpm-ci-cd
-
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
       - name: Lint
         run: pnpm lint:frontend
 
   frontend-test:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm and Node.js
-        uses: ./.github/actions/setup-pnpm-ci-cd
-
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
       - name: Lint
         run: pnpm test:frontend
+
+  frontend-build:
+    needs: [frontend-lint, frontend-test]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
+      - name: Build
+        run: |
+          pnpm build:frontend
 
   backend-lint:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm and Node.js
-        uses: ./.github/actions/setup-pnpm-ci-cd
-
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
       - name: Lint
         run: pnpm lint:backend
 
   backend-test:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm and Node.js
-        uses: ./.github/actions/setup-pnpm-ci-cd
-
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
       - name: Test
         run: pnpm test:backend
+
+  backend-smoke-test:
+    needs: [backend-lint, backend-test]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-pnpm-ci-cd
+      - name: Smoke Test
+        run: |
+          pnpm build:backend
+          pnpm start:backend
+          curl -X GET http://localhost:3000/health
