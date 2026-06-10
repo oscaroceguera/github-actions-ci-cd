@@ -12,8 +12,8 @@ inputs:
     default: "11"
 
 runs:
-  using: 'composite'
-  steps: Setup pnpm
+  using: "composite"
+  steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
@@ -21,7 +21,7 @@ runs:
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
-        cache: 'pnpm'
+        cache: "pnpm"
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v6
@@ -30,4 +30,5 @@ runs:
         run_install: false
 
     - name: Instalar dependencias
+      shell: bash
       run: pnpm install --frozen-lockfile
